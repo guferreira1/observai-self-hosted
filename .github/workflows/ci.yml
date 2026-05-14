@@ -1,0 +1,75 @@
+name: Self-Hosted CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - chore/initial-self-hosted-stack
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate self-hosted stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose files
+        shell: bash
+        run: |
+          cp .env.example .env
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.prod.yml config --quiet
+
+      - name: Validate Traefik compose example
+        shell: bash
+        run: |
+          cp .env.example .env
+          echo "LETSENCRYPT_EMAIL=admin@example.com" >> .env
+          docker compose \
+            -f docker-compose.yml \
+            -f traefik/docker-compose.traefik.yml \
+            config --quiet
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.15.4
+
+      - name: Lint Helm chart
+        run: helm lint ./helm/observai
+
+      - name: Render Helm chart
+        run: helm template observai ./helm/observai --namespace observai > /tmp/observai-rendered.yaml
+
+      - name: Validate Kubernetes YAML syntax
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: |
+            k8s/base
+            helm/observai
+            docker-compose.yml
+            docker-compose.prod.yml
+            docker-compose.override.example.yml
+            traefik/docker-compose.traefik.yml
+          config_data: |
+            extends: default
+            rules:
+              line-length: disable
+              document-start: disable
+              truthy: disable
+
+      - name: Check shell scripts syntax
+        shell: bash
+        run: |
+          bash -n scripts/generate-secrets.sh
+          bash -n scripts/backup-postgres.sh
+          bash -n scripts/restore-postgres.sh
