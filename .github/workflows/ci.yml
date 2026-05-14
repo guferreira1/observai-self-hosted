@@ -1,10 +1,20 @@
 name: Self-Hosted CI
 
-on:
+"on":
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: self-hosted-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
@@ -43,16 +53,18 @@ jobs:
       - name: Render Helm chart
         run: helm template observai ./helm/observai --namespace observai > /tmp/observai-rendered.yaml
 
-      - name: Validate Kubernetes YAML syntax
+      - name: Validate YAML syntax
         uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: |
+            .github/workflows/ci.yml
             k8s/base
-            helm/observai
             docker-compose.yml
             docker-compose.prod.yml
             docker-compose.override.example.yml
             traefik/docker-compose.traefik.yml
+            helm/observai/Chart.yaml
+            helm/observai/values.yaml
           config_data: |
             extends: default
             rules:
@@ -63,6 +75,6 @@ jobs:
       - name: Check shell scripts syntax
         shell: bash
         run: |
-          bash -n scripts/generate-secrets.sh
-          bash -n scripts/backup-postgres.sh
-          bash -n scripts/restore-postgres.sh
+          for script in scripts/*.sh; do
+            bash -n "$script"
+          done
