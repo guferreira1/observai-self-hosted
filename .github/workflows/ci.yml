@@ -1,13 +1,6 @@
 name: Self-Hosted CI
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
-      - chore/initial-self-hosted-stack
   workflow_dispatch:
 
 permissions:
