@@ -1,0 +1,47 @@
+image:
+  api:
+    repository: observai/observai-api
+    tag: v0.1.0
+  web:
+    repository: observai/observai-web
+    tag: v0.1.0
+
+api:
+  replicas: 1
+  port: 8080
+
+web:
+  replicas: 1
+  port: 3000
+
+config:
+  appEnv: self-hosted
+  logLevel: info
+  publicUrl: https://observai.example.com
+  allowedOrigins: https://observai.example.com
+  trustProxy: "true"
+  browserApiUrl: /api
+  redisUrl: redis://observai-redis:6379/0
+
+secrets:
+  databaseUrl: postgres://observai:change-me@observai-postgres:5432/observai?sslmode=disable
+  postgresDb: observai
+  postgresUser: observai
+  postgresPassword: change-me
+  jwtSecret: change-me
+  refreshTokenSecret: change-me
+  encryptionKey: change-me-32-byte-minimum-secret
+
+ingress:
+  enabled: true
+  className: ""
+  host: observai.example.com
+  tls: []
+
+postgres:
+  enabled: true
+  storage: 10Gi
+
+redis:
+  enabled: true
+  storage: 2Gi
