@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: observai-redis
+  namespace: observai
+spec:
+  selector:
+    app: observai-redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: observai-redis-data
+  namespace: observai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: observai-redis
+  namespace: observai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: observai-redis
+  template:
+    metadata:
+      labels:
+        app: observai-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command: ["redis-server", "--appendonly", "yes"]
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: observai-redis-data
