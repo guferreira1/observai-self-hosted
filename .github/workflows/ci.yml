@@ -1,9 +1,6 @@
 name: Self-Hosted CI
 
 "on":
-  push:
-    branches:
-      - "**"
   pull_request:
     branches:
       - "**"
