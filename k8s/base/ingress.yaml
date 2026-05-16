@@ -12,9 +12,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: observai-api
+                name: observai-web
                 port:
-                  number: 8080
+                  number: 3000
           - path: /
             pathType: Prefix
             backend:
