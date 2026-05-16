@@ -1,0 +1,41 @@
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: observai-traefik
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+    networks:
+      - observai
+
+  observai-api:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.observai-api.rule=Host(`${OBSERVAI_DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.observai-api.entrypoints=websecure"
+      - "traefik.http.routers.observai-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.observai-api.loadbalancer.server.port=8080"
+
+  observai-web:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.observai-web.rule=Host(`${OBSERVAI_DOMAIN}`)"
+      - "traefik.http.routers.observai-web.entrypoints=websecure"
+      - "traefik.http.routers.observai-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.observai-web.loadbalancer.server.port=3000"
+
+volumes:
+  traefik_letsencrypt:

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: observai-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: observai-api
+  template:
+    metadata:
+      labels:
+        app: observai-api
+    spec:
+      containers:
+        - name: observai-api
+          image: "{{ .Values.image.api.repository }}:{{ .Values.image.api.tag }}"
+          ports:
+            - containerPort: {{ .Values.api.port }}
+          envFrom:
+            - configMapRef:
+                name: observai-config
+            - secretRef:
+                name: observai-secrets
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{ .Values.api.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.api.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 20

@@ -1,0 +1,80 @@
+name: Self-Hosted CI
+
+"on":
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: self-hosted-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate self-hosted stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose files
+        shell: bash
+        run: |
+          cp .env.example .env
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.prod.yml config --quiet
+
+      - name: Validate Traefik compose example
+        shell: bash
+        run: |
+          cp .env.example .env
+          echo "LETSENCRYPT_EMAIL=admin@example.com" >> .env
+          docker compose \
+            -f docker-compose.yml \
+            -f traefik/docker-compose.traefik.yml \
+            config --quiet
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.15.4
+
+      - name: Lint Helm chart
+        run: helm lint ./helm/observai
+
+      - name: Render Helm chart
+        run: helm template observai ./helm/observai --namespace observai > /tmp/observai-rendered.yaml
+
+      - name: Validate YAML syntax
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: |
+            .github/workflows/ci.yml
+            k8s/base
+            docker-compose.yml
+            docker-compose.prod.yml
+            docker-compose.override.example.yml
+            traefik/docker-compose.traefik.yml
+            helm/observai/Chart.yaml
+            helm/observai/values.yaml
+          config_data: |
+            extends: default
+            rules:
+              line-length: disable
+              document-start: disable
+              truthy: disable
+
+      - name: Check shell scripts syntax
+        shell: bash
+        run: |
+          for script in scripts/*.sh; do
+            bash -n "$script"
+          done

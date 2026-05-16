@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: observai-api
+  namespace: observai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: observai-api
+  template:
+    metadata:
+      labels:
+        app: observai-api
+    spec:
+      containers:
+        - name: observai-api
+          image: observai/observai-api:v0.1.0
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: observai-config
+            - secretRef:
+                name: observai-secrets
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
