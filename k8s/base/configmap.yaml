@@ -4,11 +4,18 @@ metadata:
   name: observai-config
   namespace: observai
 data:
-  APP_ENV: "self-hosted"
+  OBSERVAI_ENV: "self-hosted"
+  OBSERVAI_MODE: "local"
+  OBSERVAI_TIMEZONE: "Local"
   LOG_LEVEL: "info"
   OBSERVAI_PUBLIC_URL: "https://observai.example.com"
   OBSERVAI_ALLOWED_ORIGINS: "https://observai.example.com"
   TRUST_PROXY: "true"
-  NEXT_PUBLIC_OBSERVAI_API_URL: "/api"
+  NEXT_PUBLIC_APP_NAME: "ObservAI"
+  NEXT_PUBLIC_APP_ENV: "self-hosted"
+  NEXT_PUBLIC_OBSERVAI_API_URL: "/api/observai"
+  OBSERVAI_API_URL: "http://observai-api:8080"
   OBSERVAI_REDIS_URL: "redis://observai-redis:6379/0"
   REDIS_URL: "redis://observai-redis:6379/0"
+  OBSERVAI_MIGRATE_ON_START: "true"
+  OBSERVAI_MIGRATIONS_DIR: "/app/migrations"
