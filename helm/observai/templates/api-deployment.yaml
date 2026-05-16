@@ -24,7 +24,7 @@ spec:
                 name: observai-secrets
           readinessProbe:
             httpGet:
-              path: /ready
+              path: /readyz
               port: {{ .Values.api.port }}
             initialDelaySeconds: 10
             periodSeconds: 10

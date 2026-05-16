@@ -9,4 +9,5 @@ data:
   OBSERVAI_ALLOWED_ORIGINS: {{ .Values.config.allowedOrigins | quote }}
   TRUST_PROXY: {{ .Values.config.trustProxy | quote }}
   NEXT_PUBLIC_OBSERVAI_API_URL: {{ .Values.config.browserApiUrl | quote }}
+  OBSERVAI_REDIS_URL: {{ .Values.config.redisUrl | quote }}
   REDIS_URL: {{ .Values.config.redisUrl | quote }}
