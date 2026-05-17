@@ -46,8 +46,14 @@ NEXT_PUBLIC_APP_BUILD_HASH=local
 
 ## 3) Bootstrap da API
 
+`OBSERVAI_API_PORT` é a porta em que o processo Go escuta dentro do container.
+`OBSERVAI_API_HOST_PORT` é a porta que o Docker publica no host na stack Compose
+padrão — ajuste quando algo no host já estiver usando a 8080. As duas têm 8080
+como default e podem variar independentemente.
+
 ```env
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_ENV=self-hosted
 OBSERVAI_MODE=local
 OBSERVAI_TIMEZONE=Local

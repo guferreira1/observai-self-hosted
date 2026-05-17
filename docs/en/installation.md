@@ -27,7 +27,10 @@ OBSERVAI_API_VERSION=v0.1.0
 OBSERVAI_WEB_VERSION=v0.1.0
 
 # Local exposure
+# OBSERVAI_API_PORT is the port the API listens on inside its container.
+# OBSERVAI_API_HOST_PORT is the host port Docker publishes; change only if 8080 is busy.
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_WEB_PORT=3000
 
 # Browser API path and internal Web-to-API target

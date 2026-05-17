@@ -46,8 +46,15 @@ NEXT_PUBLIC_APP_BUILD_HASH=local
 
 ## 3) API bootstrap variables
 
+`OBSERVAI_API_PORT` is the port the Go API listens on inside the container.
+`OBSERVAI_API_HOST_PORT` is the host-side port Docker publishes for the API
+service in the bundled Compose stack — set it when something else on the host
+already binds 8080. Both default to 8080, so the two can stay aligned or
+diverge independently.
+
 ```env
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_ENV=self-hosted
 OBSERVAI_MODE=local
 OBSERVAI_TIMEZONE=Local

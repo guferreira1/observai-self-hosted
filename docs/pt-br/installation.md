@@ -27,7 +27,10 @@ OBSERVAI_API_VERSION=v0.1.0
 OBSERVAI_WEB_VERSION=v0.1.0
 
 # Exposição local
+# OBSERVAI_API_PORT é a porta que a API escuta dentro do container.
+# OBSERVAI_API_HOST_PORT é a porta publicada no host; só altere se a 8080 estiver ocupada.
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_WEB_PORT=3000
 
 # Caminho usado pelo navegador e destino interno Web -> API
