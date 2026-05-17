@@ -9,7 +9,11 @@ data:
   OBSERVAI_TIMEZONE: "Local"
   LOG_LEVEL: "info"
   OBSERVAI_PUBLIC_URL: "https://observai.example.com"
-  OBSERVAI_ALLOWED_ORIGINS: "https://observai.example.com"
+  # CORS allowlist for the API. Empty disables CORS (default single-domain
+  # Ingress routes the browser through observai-web, so no cross-origin
+  # request reaches the API). Set this only when serving Web and API from
+  # different origins; comma-separated, exact origins, no wildcards.
+  OBSERVAI_ALLOWED_ORIGINS: ""
   TRUST_PROXY: "true"
   NEXT_PUBLIC_APP_NAME: "ObservAI"
   NEXT_PUBLIC_APP_ENV: "self-hosted"

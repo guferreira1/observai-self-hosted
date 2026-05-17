@@ -96,7 +96,9 @@ Use the production compose file and keep the browser API path as `/api/observai`
 
 ```bash
 cp .env.example .env
-# Set OBSERVAI_DOMAIN, OBSERVAI_PUBLIC_URL, OBSERVAI_ALLOWED_ORIGINS and secrets.
+# Set OBSERVAI_DOMAIN, OBSERVAI_PUBLIC_URL and secrets.
+# OBSERVAI_ALLOWED_ORIGINS is only needed when Web and API run on different
+# origins (see docs/en/production.md "Split deployment").
 docker compose -f docker-compose.prod.yml up -d
 ```
 

@@ -96,7 +96,9 @@ Use `docker-compose.prod.yml` e mantenha o caminho do navegador como `/api/obser
 
 ```bash
 cp .env.example .env
-# defina OBSERVAI_DOMAIN, OBSERVAI_PUBLIC_URL, OBSERVAI_ALLOWED_ORIGINS e segredos.
+# defina OBSERVAI_DOMAIN, OBSERVAI_PUBLIC_URL e segredos.
+# OBSERVAI_ALLOWED_ORIGINS só é necessário quando Web e API rodam em origens
+# diferentes (veja docs/pt-br/production.md "Split deployment").
 docker compose -f docker-compose.prod.yml up -d
 ```
 
