@@ -16,17 +16,24 @@ Use explicit tags (`v0.1.x`) in production. Avoid `latest`.
 
 ## 2) API routing and web behavior
 
-`NEXT_PUBLIC_OBSERVAI_API_URL` is the base path used by the frontend.
+`NEXT_PUBLIC_OBSERVAI_API_URL` is the base path used by the browser.
+Keep it on the same-origin Web proxy path:
 
 ```env
-# Local mode
-NEXT_PUBLIC_OBSERVAI_API_URL=http://localhost:8080
-
-# Production proxy mode
-# NEXT_PUBLIC_OBSERVAI_API_URL=/api
+NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai
 ```
 
-Use `/api` when browser traffic for API and web share the same domain.
+`OBSERVAI_API_URL` is used by the Next.js server-side proxy to reach the API from inside the deployment network:
+
+```env
+OBSERVAI_API_URL=http://observai-api:8080
+```
+
+With this model:
+
+```txt
+Browser -> /api/observai/* -> observai-web -> observai-api:8080
+```
 
 Also available for UI labeling:
 
@@ -41,7 +48,7 @@ NEXT_PUBLIC_APP_BUILD_HASH=local
 
 ```env
 OBSERVAI_API_PORT=8080
-OBSERVAI_ENV=local
+OBSERVAI_ENV=self-hosted
 OBSERVAI_MODE=local
 OBSERVAI_TIMEZONE=Local
 
@@ -51,24 +58,24 @@ OBSERVAI_MIGRATE_ON_START=true
 OBSERVAI_MIGRATIONS_DIR=/app/migrations
 ```
 
-`OBSERVAI_DATABASE_DSN` and `OBSERVAI_REDIS_URL` are required for startup.
+`OBSERVAI_DATABASE_DSN` and `OBSERVAI_REDIS_URL` are required when using PostgreSQL and Redis-backed runtime behavior.
 
 ## 4) Secret variables
 
-This repository accepts these compatibility names:
+Use the current API environment variable names:
 
 ```env
-JWT_SECRET=change-me
-REFRESH_TOKEN_SECRET=change-me
-ENCRYPTION_KEY=change-me-32-byte-minimum-secret
+OBSERVAI_JWT_SECRET=change-me-local-jwt-secret-minimum-32-bytes
+OBSERVAI_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 ```
 
-If you are using the API image directly and prefer current backend naming,
-use:
+`OBSERVAI_JWT_SECRET` should be at least 32 bytes for non-demo environments.
+`OBSERVAI_ENCRYPTION_KEY` must decode to exactly 32 bytes. A 64-character hex value is the recommended format.
 
-```env
-OBSERVAI_JWT_SECRET=change-me
-OBSERVAI_ENCRYPTION_KEY=change-me-32-byte-minimum-secret
+Generate compatible values with:
+
+```bash
+bash scripts/generate-secrets.sh
 ```
 
 ## 5) PostgreSQL and Redis services
@@ -84,7 +91,7 @@ REDIS_PORT=6379
 
 `POSTGRES_*` drives the bundled PostgreSQL container.
 
-`REDIS_*` drives the bundled Redis container and API connection.
+`REDIS_PORT` drives the bundled Redis container and `OBSERVAI_REDIS_URL` drives the API connection.
 
 Compatibility aliases are optional:
 
@@ -112,10 +119,11 @@ needs to be tuned.
 
 ## 7) Environment-specific defaults
 
-| Scenario | NEXT_PUBLIC_OBSERVAI_API_URL | `OBSERVAI_MODE` | Notes |
-| --- | --- | --- | --- |
-| Local machine | `http://localhost:8080` | `local` | direct API access |
-| Reverse proxy | `/api` | `local` | same-origin API path |
+| Scenario | NEXT_PUBLIC_OBSERVAI_API_URL | OBSERVAI_API_URL | `OBSERVAI_MODE` | Notes |
+| --- | --- | --- | --- | --- |
+| Local Docker Compose | `/api/observai` | `http://observai-api:8080` | `local` | browser uses Web proxy |
+| Reverse proxy | `/api/observai` | `http://observai-api:8080` | `local` | same-origin API path |
+| Kubernetes/Helm | `/api/observai` | `http://observai-api:8080` | `local` | ingress routes to Web proxy |
 
 ## 8) Validation checks
 
@@ -123,7 +131,8 @@ After changing environment variables:
 
 ```bash
 docker compose up -d
-docker compose exec observai-api env | rg "OBSERVAI_|NEXT_PUBLIC_"
+docker compose exec observai-api env | grep "OBSERVAI_"
+docker compose exec observai-web env | grep "OBSERVAI_API_URL\|NEXT_PUBLIC_OBSERVAI_API_URL"
 ```
 
 Then verify:
@@ -131,4 +140,5 @@ Then verify:
 ```bash
 curl -fsS http://localhost:8080/health
 curl -fsS http://localhost:8080/readyz
+curl -fsS http://localhost:3000/api/observai/health
 ```
