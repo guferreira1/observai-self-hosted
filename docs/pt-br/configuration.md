@@ -99,13 +99,6 @@ REDIS_PORT=6379
 
 `REDIS_PORT` afeta o container Redis e `OBSERVAI_REDIS_URL` afeta a conexão da API.
 
-Aliases opcionais:
-
-```env
-DATABASE_URL=postgres://observai:change-me@postgres:5432/observai?sslmode=disable
-REDIS_URL=redis://redis:6379/0
-```
-
 ## 6) Ajustes avançados
 
 Você pode repassar quaisquer variáveis do `observai-api`:

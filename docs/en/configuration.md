@@ -100,13 +100,6 @@ REDIS_PORT=6379
 
 `REDIS_PORT` drives the bundled Redis container and `OBSERVAI_REDIS_URL` drives the API connection.
 
-Compatibility aliases are optional:
-
-```env
-DATABASE_URL=postgres://observai:change-me@postgres:5432/observai?sslmode=disable
-REDIS_URL=redis://redis:6379/0
-```
-
 ## 6) Production-only tuning
 
 In addition to self-hosted settings, you can pass any API variable from

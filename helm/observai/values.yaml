@@ -19,14 +19,11 @@ config:
   mode: local
   timezone: Local
   appEnv: self-hosted
-  logLevel: info
-  publicUrl: https://observai.example.com
   # CORS allowlist for the API. Empty disables CORS (default single-domain
   # Ingress routes the browser through the Web service). Set only for split
   # deployments where Web and API live on different origins. Comma-separated,
   # exact origins, no wildcards.
   allowedOrigins: ""
-  trustProxy: "true"
   browserApiUrl: /api/observai
   apiUrl: http://observai-api:8080
   redisUrl: redis://observai-redis:6379/0

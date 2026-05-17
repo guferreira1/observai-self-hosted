@@ -1,7 +1,8 @@
 services:
   observai-api:
     environment:
-      LOG_LEVEL: debug
+      # OBSERVAI_ENV=local switches the Go logger to debug level.
+      OBSERVAI_ENV: local
 
   observai-web:
     environment:

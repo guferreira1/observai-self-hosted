@@ -53,7 +53,6 @@ Security checklist:
 NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai
 OBSERVAI_API_URL=http://observai-api:8080
 NEXT_PUBLIC_APP_ENV=production
-LOG_LEVEL=info
 
 OBSERVAI_ENV=self-hosted
 OBSERVAI_MODE=local
