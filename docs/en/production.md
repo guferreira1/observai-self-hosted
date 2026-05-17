@@ -2,20 +2,23 @@
 
 ## Recommended architecture
 
-Use one public domain and route API calls through `/api`:
+Use one public domain and keep browser API calls on the Web proxy path:
 
 ```txt
-https://observai.example.com      -> observai-web
-https://observai.example.com/api  -> observai-api
+https://observai.example.com                  -> observai-web
+https://observai.example.com/api/observai     -> API access path through observai-web
+observai-web                                  -> observai-api:8080
 ```
 
-This pattern avoids CORS issues and centralizes TLS.
+This pattern avoids CORS issues, centralizes TLS and keeps the frontend aligned with the built-in Next.js proxy.
 
 ## Pre-production checklist
 
 - Use fixed image tags (`v0.1.x`) and avoid `latest`.
 - Keep `OBSERVAI_MIGRATE_ON_START=true` for first production boot.
-- Use strong secrets and never reuse them between environments.
+- Use `NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai`.
+- Use `OBSERVAI_API_URL=http://observai-api:8080` when Web and API share the same Docker/Kubernetes network.
+- Use strong `OBSERVAI_JWT_SECRET` and `OBSERVAI_ENCRYPTION_KEY` values.
 - Keep PostgreSQL and Redis with non-default credentials.
 - Expose only needed ports.
 - Validate backups before opening traffic.
@@ -32,13 +35,17 @@ Security checklist:
 ## Suggested production `.env` values
 
 ```env
-NEXT_PUBLIC_OBSERVAI_API_URL=/api
+NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai
+OBSERVAI_API_URL=http://observai-api:8080
 NEXT_PUBLIC_APP_ENV=production
 LOG_LEVEL=info
 
+OBSERVAI_ENV=self-hosted
+OBSERVAI_MODE=local
 OBSERVAI_API_PORT=8080
 OBSERVAI_WEB_PORT=3000
 OBSERVAI_MIGRATE_ON_START=true
+OBSERVAI_MIGRATIONS_DIR=/app/migrations
 ```
 
 ## Production startup
@@ -55,9 +62,8 @@ docker compose -f docker-compose.prod.yml up -d
 ## Reverse proxy hardening
 
 - Force HTTPS with HSTS.
-- Keep websocket support enabled when needed by frontend features.
-- If reverse proxy strips headers, forward `Host`, `X-Forwarded-*` and protocol
-  correctly.
+- Keep `/api/observai` routed to the Web service unless you configure an explicit rewrite to the API root.
+- If reverse proxy strips headers, forward `Host`, `X-Forwarded-*` and protocol correctly.
 
 ## Production rollout
 
@@ -67,5 +73,6 @@ docker compose -f docker-compose.prod.yml up -d
    - `GET /health`
    - `GET /healthz`
    - `GET /readyz`
+   - `GET /api/observai/health`
 4. Validate backup procedure.
 5. Promote DNS only after all probes pass.
