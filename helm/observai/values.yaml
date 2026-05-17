@@ -15,22 +15,27 @@ web:
   port: 3000
 
 config:
+  env: self-hosted
+  mode: local
+  timezone: Local
   appEnv: self-hosted
   logLevel: info
   publicUrl: https://observai.example.com
   allowedOrigins: https://observai.example.com
   trustProxy: "true"
-  browserApiUrl: /api
+  browserApiUrl: /api/observai
+  apiUrl: http://observai-api:8080
   redisUrl: redis://observai-redis:6379/0
+  migrateOnStart: "true"
+  migrationsDir: /app/migrations
 
 secrets:
   databaseUrl: postgres://observai:change-me@observai-postgres:5432/observai?sslmode=disable
   postgresDb: observai
   postgresUser: observai
   postgresPassword: change-me
-  jwtSecret: change-me
-  refreshTokenSecret: change-me
-  encryptionKey: change-me-32-byte-minimum-secret
+  jwtSecret: change-me-local-jwt-secret-minimum-32-bytes
+  encryptionKey: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 
 ingress:
   enabled: true
