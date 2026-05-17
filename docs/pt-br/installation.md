@@ -26,15 +26,19 @@ OBSERVAI_WEB_IMAGE=observai/observai-web
 OBSERVAI_API_VERSION=v0.1.0
 OBSERVAI_WEB_VERSION=v0.1.0
 
-# Exposição da API
+# Exposição local
 OBSERVAI_API_PORT=8080
 OBSERVAI_WEB_PORT=3000
 
-# URL usada pelo navegador (modo local)
-NEXT_PUBLIC_OBSERVAI_API_URL=http://localhost:8080
+# Caminho usado pelo navegador e destino interno Web -> API
+NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai
+OBSERVAI_API_URL=http://observai-api:8080
 NEXT_PUBLIC_APP_ENV=self-hosted
 
-# Dependências principais
+# Runtime da API
+OBSERVAI_ENV=self-hosted
+OBSERVAI_MODE=local
+OBSERVAI_TIMEZONE=Local
 OBSERVAI_DATABASE_DSN=postgres://observai:change-me@postgres:5432/observai?sslmode=disable
 OBSERVAI_REDIS_URL=redis://redis:6379/0
 OBSERVAI_MIGRATE_ON_START=true
@@ -50,12 +54,11 @@ POSTGRES_PORT=5432
 REDIS_PORT=6379
 ```
 
-Para autenticação e sessão, gere segredos fortes:
+Para login inicial, assinatura de sessão e criptografia de credenciais de provedores, gere segredos fortes:
 
 ```env
-JWT_SECRET=change-me
-REFRESH_TOKEN_SECRET=change-me
-ENCRYPTION_KEY=change-me-32-byte-minimum-secret
+OBSERVAI_JWT_SECRET=change-me-local-jwt-secret-minimum-32-bytes
+OBSERVAI_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 ```
 
 Use o script:
@@ -64,19 +67,14 @@ Use o script:
 bash scripts/generate-secrets.sh
 ```
 
-Os templates deste repositório aceitam esses nomes de compatibilidade.
-Se você executar o API diretamente com nomeação atualizada, pode usar:
-
-```env
-OBSERVAI_JWT_SECRET=change-me
-OBSERVAI_ENCRYPTION_KEY=change-me-32-byte-minimum-secret
-```
+`OBSERVAI_ENCRYPTION_KEY` precisa decodificar exatamente para 32 bytes. O formato recomendado pelo script é hexadecimal com 64 caracteres.
 
 Validações básicas:
 
 - `OBSERVAI_DATABASE_DSN` e `POSTGRES_*` devem corresponder.
 - `OBSERVAI_REDIS_URL` e `REDIS_PORT` devem corresponder.
-- `NEXT_PUBLIC_OBSERVAI_API_URL` deve refletir o cenário real.
+- `NEXT_PUBLIC_OBSERVAI_API_URL` deve permanecer `/api/observai` para o navegador usar o proxy do Web.
+- `OBSERVAI_API_URL` deve apontar para a API acessível pelo container Web.
 
 ## 3) Subir em ambiente local
 
@@ -94,12 +92,11 @@ docker compose logs -f observai-web
 
 ## 4) Subir em produção (proxy reverso)
 
-Use `docker-compose.prod.yml` e configure a URL do navegador como `/api`:
+Use `docker-compose.prod.yml` e mantenha o caminho do navegador como `/api/observai`:
 
 ```bash
 cp .env.example .env
-# defina:
-NEXT_PUBLIC_OBSERVAI_API_URL=/api
+# defina OBSERVAI_DOMAIN, OBSERVAI_PUBLIC_URL, OBSERVAI_ALLOWED_ORIGINS e segredos.
 docker compose -f docker-compose.prod.yml up -d
 ```
 
@@ -116,6 +113,7 @@ Se a UI ficar aguardando API:
 ```bash
 docker compose logs -f observai-api
 curl http://localhost:8080/healthz
+curl http://localhost:3000/api/observai/health
 ```
 
 ## 6) Dependências externas
