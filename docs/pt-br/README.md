@@ -37,8 +37,9 @@ Os repositórios de código-fonte da aplicação ficam em:
 ```txt
 Browser
   -> observai-web (HTTP 3000)
-     -> NEXT_PUBLIC_OBSERVAI_API_URL=http://localhost:8080
-        -> observai-api (HTTP 8080)
+  -> /api/observai/*
+  -> proxy interno do Next.js
+  -> observai-api (HTTP 8080)
   -> PostgreSQL (estado)
   -> Redis (fila/cache)
 ```
@@ -46,12 +47,11 @@ Browser
 ### Produção com proxy reverso
 
 ```txt
-https://observai.example.com      -> observai-web
-https://observai.example.com/api  -> observai-api
+https://observai.example.com                  -> observai-web
+https://observai.example.com/api/observai     -> caminho de acesso da API
 ```
 
-Em produção, use `NEXT_PUBLIC_OBSERVAI_API_URL=/api` para manter as requisições no
-mesmo domínio e evitar problemas de CORS.
+Use `NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai` para manter as chamadas do navegador no mesmo domínio e compatíveis com o proxy do Web.
 
 ## Inicialização mínima
 
@@ -65,7 +65,8 @@ docker compose up -d
 Acesso:
 
 - `http://localhost:3000` (web)
-- `http://localhost:8080/healthz` (readiness da API)
+- `http://localhost:3000/api/observai/health` (API via proxy do Web)
+- `http://localhost:8080/healthz` (readiness direto da API)
 
 ## Quando usar este repositório
 
