@@ -23,18 +23,19 @@ services:
 
   observai-api:
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.observai-api.rule=Host(`${OBSERVAI_DOMAIN}`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.observai-api.entrypoints=websecure"
-      - "traefik.http.routers.observai-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.observai-api.loadbalancer.server.port=8080"
+      - "traefik.enable=false"
 
   observai-web:
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.observai-web-api.rule=Host(`${OBSERVAI_DOMAIN}`) && PathPrefix(`/api/observai`)"
+      - "traefik.http.routers.observai-web-api.entrypoints=websecure"
+      - "traefik.http.routers.observai-web-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.observai-web-api.priority=100"
       - "traefik.http.routers.observai-web.rule=Host(`${OBSERVAI_DOMAIN}`)"
       - "traefik.http.routers.observai-web.entrypoints=websecure"
       - "traefik.http.routers.observai-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.observai-web.priority=1"
       - "traefik.http.services.observai-web.loadbalancer.server.port=3000"
 
 volumes:
