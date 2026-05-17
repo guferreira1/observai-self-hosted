@@ -48,6 +48,7 @@ docker compose up -d
 Open:
 
 - Web: `http://localhost:3000`
+- API through Web proxy: `http://localhost:3000/api/observai/health`
 - API direct health check: `http://localhost:8080/healthz`
 
 ## What docs cover
@@ -85,16 +86,18 @@ The bilingual documentation covers:
 ## Compatibility note
 
 `observai-api` and `observai-web` must be reachable by the network model defined in your stack.
-For a browser-safe production model, keep the recommended `/api` path routing rule:
+For a browser-safe model, keep the recommended `/api/observai` path routing rule:
 
 - `https://observai.example.com` -> Web
-- `https://observai.example.com/api` -> API
+- `https://observai.example.com/api/observai` -> API access path
 
 This is the default path model in:
 
+- `.env.example`
 - `docker-compose.prod.yml`
 - `nginx/nginx.conf`
 - `traefik/docker-compose.traefik.yml`
+- Kubernetes manifests
 - Helm ingress/templates
 
 ## License
