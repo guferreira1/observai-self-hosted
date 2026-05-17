@@ -25,37 +25,39 @@ Check:
 - `OBSERVAI_DATABASE_DSN`
 - `OBSERVAI_REDIS_URL`
 - `OBSERVAI_MIGRATE_ON_START` if DB is empty.
-- `JWT_SECRET` / `ENCRYPTION_KEY` (repository compatibility names) or
-  `OBSERVAI_JWT_SECRET` / `OBSERVAI_ENCRYPTION_KEY`.
+- `OBSERVAI_JWT_SECRET`
+- `OBSERVAI_ENCRYPTION_KEY`
 
 ## Web cannot reach API
 
-Use the correct browser API URL for your deployment mode.
-
-Local:
+Use the Web proxy path for browser calls and the internal API URL for server-side proxy calls.
 
 ```env
-NEXT_PUBLIC_OBSERVAI_API_URL=http://localhost:8080
-```
-
-Reverse proxy:
-
-```env
-NEXT_PUBLIC_OBSERVAI_API_URL=/api
+NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai
+OBSERVAI_API_URL=http://observai-api:8080
 ```
 
 Then verify browser calls in devtools and endpoint:
 
 ```bash
-curl -I https://observai.example.com/api/v1/setup/status
+curl -I http://localhost:3000/api/observai/health
+curl -I https://observai.example.com/api/observai/v1/setup/status
 ```
 
 ## Health and readiness
+
+Direct API checks:
 
 ```bash
 curl -i http://localhost:8080/health
 curl -i http://localhost:8080/healthz
 curl -i http://localhost:8080/readyz
+```
+
+Web proxy check:
+
+```bash
+curl -i http://localhost:3000/api/observai/health
 ```
 
 `/readyz` is the main readiness gate for API dependencies.
@@ -74,6 +76,7 @@ docker compose exec redis redis-cli ping
 
 1. Confirm API is running and `readyz` is `200`.
 2. Open:
-   - local: `http://localhost:8080/v1/setup/status`
-   - production: `https://observai.example.com/api/v1/setup/status`
+   - direct API: `http://localhost:8080/v1/setup/status`
+   - through Web proxy: `http://localhost:3000/api/observai/v1/setup/status`
+   - production: `https://observai.example.com/api/observai/v1/setup/status`
 3. Re-run browser with a clean cache/cookies.
