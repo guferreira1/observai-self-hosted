@@ -16,13 +16,13 @@ spec:
     - host: {{ .Values.ingress.host | quote }}
       http:
         paths:
-          - path: /api
+          - path: /api/observai
             pathType: Prefix
             backend:
               service:
-                name: observai-api
+                name: observai-web
                 port:
-                  number: {{ .Values.api.port }}
+                  number: {{ .Values.web.port }}
           - path: /
             pathType: Prefix
             backend:
