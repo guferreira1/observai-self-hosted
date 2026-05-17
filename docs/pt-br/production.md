@@ -10,7 +10,22 @@ https://observai.example.com/api/observai     -> caminho de acesso da API via ob
 observai-web                                  -> observai-api:8080
 ```
 
-Esse padrão reduz CORS, centraliza TLS e mantém o frontend compatível com o proxy interno do Next.js.
+Esse padrão reduz CORS, centraliza TLS e mantém o frontend compatível com o proxy interno do Next.js. Nesse layout padrão, deixe `OBSERVAI_ALLOWED_ORIGINS` vazio — a API nunca recebe requisição cross-origin.
+
+### Split deployment (avançado)
+
+Se você servir Web e API em origens diferentes (por exemplo, `https://app.example.com` e `https://api.example.com`), habilite o CORS na API listando a origem do Web em `OBSERVAI_ALLOWED_ORIGINS`:
+
+```env
+OBSERVAI_ALLOWED_ORIGINS=https://app.example.com
+```
+
+Observações:
+
+- Use vírgula para separar múltiplas origens; cada entrada deve ser uma origem exata (`https://host[:porta]`).
+- Wildcards (`*`) são rejeitados. A API sempre envia `Access-Control-Allow-Credentials: true` para que o login por cookie continue funcionando, e a especificação CORS proíbe credenciais com origens wildcard.
+- Respostas de preflight são cacheadas por 5 minutos.
+- Aponte o navegador direto para a API com `NEXT_PUBLIC_OBSERVAI_API_URL=https://api.example.com` e deixe `OBSERVAI_API_URL` apenas para chamadas server-side (ou desative).
 
 ## Checklist pré-produção
 
@@ -38,11 +53,11 @@ Segurança:
 NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai
 OBSERVAI_API_URL=http://observai-api:8080
 NEXT_PUBLIC_APP_ENV=production
-LOG_LEVEL=info
 
 OBSERVAI_ENV=self-hosted
 OBSERVAI_MODE=local
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_WEB_PORT=3000
 OBSERVAI_MIGRATE_ON_START=true
 OBSERVAI_MIGRATIONS_DIR=/app/migrations

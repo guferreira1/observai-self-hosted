@@ -27,7 +27,10 @@ OBSERVAI_API_VERSION=v0.1.0
 OBSERVAI_WEB_VERSION=v0.1.0
 
 # Local exposure
+# OBSERVAI_API_PORT is the port the API listens on inside its container.
+# OBSERVAI_API_HOST_PORT is the host port Docker publishes; change only if 8080 is busy.
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_WEB_PORT=3000
 
 # Browser API path and internal Web-to-API target
@@ -96,7 +99,10 @@ Use the production compose file and keep the browser API path as `/api/observai`
 
 ```bash
 cp .env.example .env
-# Set OBSERVAI_DOMAIN, OBSERVAI_PUBLIC_URL, OBSERVAI_ALLOWED_ORIGINS and secrets.
+# Set OBSERVAI_DOMAIN and secrets.
+# OBSERVAI_ALLOWED_ORIGINS is only needed when Web and API run on different
+# origins (see docs/en/production.md "Split deployment").
+# LETSENCRYPT_EMAIL is only needed with the Traefik compose profile.
 docker compose -f docker-compose.prod.yml up -d
 ```
 

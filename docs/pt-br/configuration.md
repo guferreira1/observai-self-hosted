@@ -46,8 +46,14 @@ NEXT_PUBLIC_APP_BUILD_HASH=local
 
 ## 3) Bootstrap da API
 
+`OBSERVAI_API_PORT` é a porta em que o processo Go escuta dentro do container.
+`OBSERVAI_API_HOST_PORT` é a porta que o Docker publica no host na stack Compose
+padrão — ajuste quando algo no host já estiver usando a 8080. As duas têm 8080
+como default e podem variar independentemente.
+
 ```env
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_ENV=self-hosted
 OBSERVAI_MODE=local
 OBSERVAI_TIMEZONE=Local
@@ -92,13 +98,6 @@ REDIS_PORT=6379
 `POSTGRES_*` afeta o container PostgreSQL.
 
 `REDIS_PORT` afeta o container Redis e `OBSERVAI_REDIS_URL` afeta a conexão da API.
-
-Aliases opcionais:
-
-```env
-DATABASE_URL=postgres://observai:change-me@postgres:5432/observai?sslmode=disable
-REDIS_URL=redis://redis:6379/0
-```
 
 ## 6) Ajustes avançados
 

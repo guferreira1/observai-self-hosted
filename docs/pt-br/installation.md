@@ -27,7 +27,10 @@ OBSERVAI_API_VERSION=v0.1.0
 OBSERVAI_WEB_VERSION=v0.1.0
 
 # Exposição local
+# OBSERVAI_API_PORT é a porta que a API escuta dentro do container.
+# OBSERVAI_API_HOST_PORT é a porta publicada no host; só altere se a 8080 estiver ocupada.
 OBSERVAI_API_PORT=8080
+OBSERVAI_API_HOST_PORT=8080
 OBSERVAI_WEB_PORT=3000
 
 # Caminho usado pelo navegador e destino interno Web -> API
@@ -96,7 +99,10 @@ Use `docker-compose.prod.yml` e mantenha o caminho do navegador como `/api/obser
 
 ```bash
 cp .env.example .env
-# defina OBSERVAI_DOMAIN, OBSERVAI_PUBLIC_URL, OBSERVAI_ALLOWED_ORIGINS e segredos.
+# defina OBSERVAI_DOMAIN e segredos.
+# OBSERVAI_ALLOWED_ORIGINS só é necessário quando Web e API rodam em origens
+# diferentes (veja docs/pt-br/production.md "Split deployment").
+# LETSENCRYPT_EMAIL só é necessário com o perfil Traefik do compose.
 docker compose -f docker-compose.prod.yml up -d
 ```
 
