@@ -36,8 +36,9 @@ The backend and frontend source code is maintained in:
 ```txt
 Browser
   -> observai-web (HTTP 3000)
-     -> NEXT_PUBLIC_OBSERVAI_API_URL=http://localhost:8080
-        -> observai-api (HTTP 8080)
+  -> /api/observai/*
+  -> Next.js proxy
+  -> observai-api (HTTP 8080)
   -> PostgreSQL (stateful)
   -> Redis (queue/cache)
 ```
@@ -45,12 +46,11 @@ Browser
 ### Production with reverse proxy
 
 ```txt
-https://observai.example.com      -> observai-web
-https://observai.example.com/api  -> observai-api
+https://observai.example.com                  -> observai-web
+https://observai.example.com/api/observai     -> API access path
 ```
 
-In production we recommend `NEXT_PUBLIC_OBSERVAI_API_URL=/api` so browser requests
-are same-origin and proxy routing is clear.
+Use `NEXT_PUBLIC_OBSERVAI_API_URL=/api/observai` so browser requests stay same-origin and match the web proxy path.
 
 ## Minimal startup
 
@@ -64,7 +64,8 @@ docker compose up -d
 Then open:
 
 - `http://localhost:3000` (web)
-- `http://localhost:8080/healthz` (API readiness probe)
+- `http://localhost:3000/api/observai/health` (API through Web proxy)
+- `http://localhost:8080/healthz` (direct API readiness probe)
 
 ## Why this repository
 
